@@ -235,3 +235,91 @@
 # ## The trust_gov variable shall not be considered in the analysis.
 # 
 # SELECT * FROM allyears;  ## exporting to do exploratory data analysis with making graphs in R
+
+library(dplyr)
+
+library(readr)
+allyears <- read_csv("C:/Users/jkjil/Downloads/happiness data csvs/allyears.csv")
+View(allyears)
+
+#Trust in Government or Perception of Corruption?
+plot(allyears$trust_gov, allyears$score)
+# no apparent trend for trust_gov value <0.2; 
+# 5 points stand out with trust_gov score >0.4 and overall score <4
+# identify these 5 points in SQL:
+# SELECT * FROM allyears WHERE trust_gov > 0.4 AND score <4;
+# These 5 points are for Rwanda in each year
+cor(allyears$trust_gov, allyears$score)# 0.3984526, lower than other factors & score
+cor.test(allyears$trust_gov, allyears$score)
+# analyze without Rwanda
+
+woRwanda <- allyears %>% filter(country != "Rwanda")
+plot(woRwanda$trust_gov, woRwanda$score)
+cor(woRwanda$trust_gov, woRwanda$score) # removal of Rwanda bumps cor up to 0.4555532
+
+plot(allyears$gdp_per_cap, allyears$score) 
+cor(allyears$gdp_per_cap, allyears$score) # 0.7897241
+
+
+
+
+plot(allyears$social_support, allyears$score) 
+cor(allyears$social_support, allyears$score)# 0.6512672
+
+plot(allyears$life_exp, allyears$score)
+cor(allyears$life_exp, allyears$score)# 0.7428782
+
+
+plot(allyears$generosity, allyears$score)
+cor(allyears$generosity, allyears$score)#0.1381325
+
+plot(allyears$year, allyears$score)
+plot(allyears$score, allyears$year) # clearer visualization
+cor(allyears$year, allyears$score)#0.1381325
+
+
+
+allyears %>% group_by(year) %>% summarise(mean(score)) #mean scores are close
+# 1  2015          5.38
+# 2  2016          5.38
+# 3  2017          5.35
+# 4  2018          5.37
+# 5  2019          5.41
+
+
+## SQL exploration of dystopia_resid
+
+# SELECT * FROM allyears
+# WHERE trust_gov > 0.4 AND score <4; -- all from Rwanda
+# 
+# SELECT * FROM h2015
+# WHERE dystopia_resid = 
+#   (SELECT MAX(dystopia_resid) FROM h2015); -- Mexico, rank 14
+# 
+# SELECT * FROM h2016
+# WHERE dystopia_resid = 
+#   (SELECT MAX(dystopia_resid) FROM h2016); -- Somalia, rank 76, gdp_per_cap =?
+#   
+#   
+#   
+#   SELECT * FROM h2015
+# WHERE dystopia_resid = 
+#   (SELECT MIN(dystopia_resid) FROM h2015); -- Syria, rank 156
+# 
+# SELECT * FROM h2016
+# WHERE dystopia_resid = 
+#   (SELECT MIN(dystopia_resid) FROM h2016); -- Syria, rank 156
+# 
+# SELECT * FROM allyears
+# WHERE gdp_per_cap = 0; -- one entry per year: Congo, Somalia, Central African Republic, Somalia, Somalia
+# 
+# SELECT * FROM allyears
+# WHERE gdp_per_cap = 
+#   (SELECT MAX(gdp_per_cap) from allyears); -- Qatar, 2017, gdp_per_cap = 1.871
+# 
+# 
+# 
+# SELECT country, overall_rank, score,  gdp_per_cap, year -- reordered columns to more easily compare rank and gdp_per_cap
+# FROM allyears 
+# ORDER BY gdp_per_cap DESC 
+# LIMIT 30;
