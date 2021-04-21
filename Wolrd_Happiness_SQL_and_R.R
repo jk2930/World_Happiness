@@ -323,3 +323,89 @@ allyears %>% group_by(year) %>% summarise(mean(score)) #mean scores are close
 # FROM allyears 
 # ORDER BY gdp_per_cap DESC 
 # LIMIT 30;
+
+
+
+## Inner join on all tables by country: How does each country compare year-to-year?  
+## With analysis of change of rank and score across years.  
+## Some large differences across years suggest: Many coutries are either more stable, or have more reliable data reocording across years.
+
+# SELECT h2015.country, h2015.overall_rank as 'rank_2015', h2016.overall_rank as 'rank_2016', 
+# h2017.overall_rank as 'rank_2017', h2018.overall_rank as 'rank_2018', h2019.overall_rank as 'rank_2019',
+# GREATEST(h2015.overall_rank, h2016.overall_rank, h2017.overall_rank, h2018.overall_rank, h2019.overall_rank)
+# as 'max_rank',
+# LEAST(h2015.overall_rank, h2016.overall_rank, h2017.overall_rank, h2018.overall_rank, h2019.overall_rank)
+# as 'min_rank',
+# GREATEST(h2015.overall_rank, h2016.overall_rank, h2017.overall_rank, h2018.overall_rank, h2019.overall_rank) 
+# - LEAST(h2015.overall_rank, h2016.overall_rank, h2017.overall_rank, h2018.overall_rank, h2019.overall_rank) 
+# as 'rank_range',
+# h2015.score as 'score_2015', h2016.score as 'score_2016', 
+# h2017.score as 'score_2017', h2018.score as 'score_2018', h2019.score as 'score_2019',
+# GREATEST(h2015.score, h2016.score, h2017.score, h2018.score, h2019.score)
+# as 'max_score',
+# LEAST(h2015.score, h2016.score, h2017.score, h2018.score, h2019.score)
+# as 'min_score',
+# GREATEST(h2015.score, h2016.score, h2017.score, h2018.score, h2019.score) 
+# - LEAST(h2015.score, h2016.score, h2017.score, h2018.score, h2019.score) 
+# as 'score_range'
+# FROM h2015
+# INNER JOIN h2016 ON h2015.country = h2016.country
+# INNER JOIN h2017 ON h2015.country = h2017.country
+# INNER JOIN h2018 ON h2015.country = h2018.country
+# INNER JOIN h2019 ON h2015.country = h2019.country
+# ;   -- exporting to R for visualizing
+# 
+# ## Which countries show the most change over these 5 years?
+# 
+# SELECT country, min_rank, max_rank, rank_range, min_score, max_score, score_range
+# FROM
+# (SELECT h2015.country, h2015.overall_rank as 'rank_2015', h2016.overall_rank as 'rank_2016', 
+#   h2017.overall_rank as 'rank_2017', h2018.overall_rank as 'rank_2018', h2019.overall_rank as 'rank_2019',
+#   GREATEST(h2015.overall_rank, h2016.overall_rank, h2017.overall_rank, h2018.overall_rank, h2019.overall_rank)
+#   as 'max_rank',
+#   LEAST(h2015.overall_rank, h2016.overall_rank, h2017.overall_rank, h2018.overall_rank, h2019.overall_rank)
+#   as 'min_rank',
+#   GREATEST(h2015.overall_rank, h2016.overall_rank, h2017.overall_rank, h2018.overall_rank, h2019.overall_rank) 
+#   - LEAST(h2015.overall_rank, h2016.overall_rank, h2017.overall_rank, h2018.overall_rank, h2019.overall_rank) 
+#   as 'rank_range',
+#   h2015.score as 'score_2015', h2016.score as 'score_2016', 
+#   h2017.score as 'score_2017', h2018.score as 'score_2018', h2019.score as 'score_2019',
+#   GREATEST(h2015.score, h2016.score, h2017.score, h2018.score, h2019.score)
+#   as 'max_score',
+#   LEAST(h2015.score, h2016.score, h2017.score, h2018.score, h2019.score)
+#   as 'min_score',
+#   GREATEST(h2015.score, h2016.score, h2017.score, h2018.score, h2019.score) 
+#   - LEAST(h2015.score, h2016.score, h2017.score, h2018.score, h2019.score) 
+#   as 'score_range'
+#   FROM h2015
+#   INNER JOIN h2016 ON h2015.country = h2016.country
+#   INNER JOIN h2017 ON h2015.country = h2017.country
+#   INNER JOIN h2018 ON h2015.country = h2018.country
+#   INNER JOIN h2019 ON h2015.country = h2019.country
+# ) as A
+# ORDER BY score_range DESC
+# LIMIT 20
+# ; 
+
+rank_score <- read_csv("C:/Users/jkjil/Downloads/happiness data csvs/inner_join_country_rank_score_analysis.csv")
+View(rank_score)
+plot(rank_score$max_score, rank_score$score_range) 
+cor(rank_score$max_score, rank_score$score_range) # -0.312165
+# one apparent outlier near 7, 2.  Only point with score_range >2
+max_range <- rank_score %>% filter(score_range > 2) # Venezuela
+# rank 2015-2019: 23, 44, 82, 102, 108
+# score: 6.8 (2015) - 4.7 (2019)
+
+
+## Questions to look into: 
+### How is gdp_per_cap scaled? (why are some 0.0?) 
+### How are other factors scaled/measured?
+## How is dystopia resid calculated?
+
+h2015 <- read_csv("C:/Users/jkjil/Downloads/happiness data csvs/2015.csv")
+h2016 <- read_csv("C:/Users/jkjil/Downloads/happiness data csvs/2016.csv")
+View(h2015)
+View(h2016)
+
+
+
