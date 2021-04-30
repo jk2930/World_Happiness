@@ -76,4 +76,4 @@ cor(h2015$`Dystopia Residual`, h2015$`Happiness Score`) #0.5304735
 plot(h2016$`Dystopia Residual`, h2016$`Happiness Score`)
 cor(h2016$`Dystopia Residual`, h2016$`Happiness Score`) #0.5437376
 
-
+ 
