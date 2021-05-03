@@ -5,8 +5,28 @@
 library(dplyr)
 
 library(readr)
+
 allyears <- read_csv("C:/Users/jkjil/Downloads/happiness data csvs/allyears.csv")
 View(allyears)
+
+# all variables and score plotted against each other
+pairs(allyears[,3:9]) 
+# all show positive relationship with score
+# generosity - score appears to be the weakest
+# generosity - gdp also appears weak
+
+cor(allyears$generosity, allyears$score) #0.1381325
+plot(allyears$generosity, allyears$score)
+
+cor(allyears$generosity, allyears$gdp_per_cap) # -0.01372633
+plot(allyears$generosity, allyears$gdp_per_cap)
+# generosity and gdp are slightly inversely related.  
+# I wonder if the countries with high influences of generosity are 
+# particularly happy.
+high_generosity <- filter(allyears, generosity > 0.5) 
+# highest happiness scores are UK, Malta, and Thailand, ranked in 20s and 30s
+# also low ranks, Somaliland Region and Myanmar
+
 
 #Trust in Government or Perception of Corruption?
 plot(allyears$trust_gov, allyears$score)
@@ -69,6 +89,8 @@ h2015 <- read_csv("C:/Users/jkjil/Downloads/happiness data csvs/2015.csv")
 h2016 <- read_csv("C:/Users/jkjil/Downloads/happiness data csvs/2016.csv")
 View(h2015)
 View(h2016)
+
+pairs(h2015[,c(4,6:12)])
 
 plot(h2015$`Dystopia Residual`, h2015$`Happiness Score`)
 cor(h2015$`Dystopia Residual`, h2015$`Happiness Score`) #0.5304735
